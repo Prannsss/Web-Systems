@@ -3,7 +3,7 @@ session_start();
 
 // Guard — must be logged in
 if (!isset($_SESSION['user_id'])) {
-    header('Location: index.php');
+    header('Location: ../index.php');
     exit;
 }
 
@@ -34,11 +34,11 @@ $email = htmlspecialchars($_SESSION['email'] ?? '');
 
         <div class="flex items-center gap-6">
             <!-- Theme Toggle Component -->
-            <?php include __DIR__ . '/components/theme-toggle.php'; ?>
+            <?php include __DIR__ . '/../components/theme-toggle.php'; ?>
             
             <span class="text-sm text-gray-500 dark:text-gray-400 hidden sm:block"><?= $email ?></span>
-            <a href="logout.php"
-               class="text-sm border border-black dark:border-white px-5 py-2 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition duration-200 font-medium text-black dark:text-white">
+            <a href="../config/logout.php"
+            class="text-sm border border-black dark:border-white px-5 py-2 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition duration-200 font-medium text-black dark:text-white">
                 Logout
             </a>
         </div>

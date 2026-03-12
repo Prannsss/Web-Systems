@@ -3,7 +3,7 @@ session_start();
 
 // Redirect if already logged in
 if (isset($_SESSION['user_id'])) {
-    header('Location: hero.php');
+    header('Location: pages/dashboard.php');
     exit;
 }
 
@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             session_regenerate_id(true);
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['email']   = $user['email'];
-            header('Location: hero.php');
+            header('Location: pages/dashboard.php');
             exit;
         } else {
             $error = 'Invalid email or password.';
@@ -68,41 +68,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <form method="POST" action="index.php" novalidate>
             <!-- Email -->
-            <div class="mb-4">
-                <label for="email" class="block text-sm font-bold mb-2">
-                    Email
-                </label>
+            <div class="relative mb-6 mt-2">
                 <input
                     type="email"
                     id="email"
                     name="email"
                     value="<?= htmlspecialchars($_POST['email'] ?? '') ?>"
-                    placeholder="E.g. johndoe@email.com"
+                    placeholder="Email"
                     required
                     autocomplete="email"
-                    class="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition placeholder-gray-400"
+                    class="peer w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition bg-transparent placeholder-transparent"
                 />
+                <label
+                    for="email"
+                    class="absolute left-10 -top-2.5 bg-white px-1 text-xs text-gray-500 transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-3 peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-black pointer-events-none"
+                >
+                    Email
+                </label>
+                <span class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 peer-focus:text-black text-xl transition-colors">mail_outline</span>
             </div>
 
             <!-- Password -->
-            <div class="mb-5">
-                <label for="password" class="block text-sm font-bold mb-2">
+            <div class="relative mb-6">
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Password"
+                    required
+                    autocomplete="current-password"
+                    class="peer w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition bg-transparent placeholder-transparent"
+                />
+                <label
+                    for="password"
+                    class="absolute left-10 -top-2.5 bg-white px-1 text-xs text-gray-500 transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-3 peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-black pointer-events-none"
+                >
                     Password
                 </label>
-                <div class="relative">
-                    <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        placeholder="Enter your password"
-                        required
-                        autocomplete="current-password"
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition placeholder-gray-400 pr-12"
-                    />
-                    <button type="button" id="togglePasswordBtn" class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-black transition">
-                        <span id="toggleIcon" class="material-icons text-xl">visibility_off</span>
-                    </button>
-                </div>
+                <span class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 peer-focus:text-black text-xl transition-colors">lock_outline</span>
+                <button type="button" id="togglePasswordBtn" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-black transition-colors">
+                    <span id="toggleIcon" class="material-icons text-xl">visibility_off</span>
+                </button>
             </div>
 
             <!-- Remember Me & Forgot Password -->
@@ -111,7 +117,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <input type="checkbox" class="w-4 h-4 accent-black" />
                     Remember Me
                 </label>
-                <a href="#" class="text-sm font-medium text-black hover:underline">Forgot Password?</a>
+                <a href="pages/forgot-pw.php" class="text-sm font-medium text-black hover:underline">Forgot Password?</a>
             </div>
 
             <!-- Submit -->
@@ -125,7 +131,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <!-- Register Redirect -->
             <p class="text-center text-sm font-medium mt-6">
                 <span class="text-gray-500">Not registered yet?</span>
-                <a href="#" class="text-black hover:underline ml-1">Create an account</a>
+                <a href="pages/create-acc.php" class="text-black hover:underline ml-1">Create an account</a>
             </p>
 
         </form>
