@@ -37,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
-<!DOCTYPE html>
+<!-- The rest of the file is the HTML form for login. I will update this index to the hero page when necessary -->
 <html lang="en">
 <head>
     <meta charset="UTF-8" />

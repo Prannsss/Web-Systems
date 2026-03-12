@@ -11,19 +11,33 @@ $success = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = trim($_POST['email'] ?? '');
+    $new_password = $_POST['new_password'] ?? '';
+    $confirm_password = $_POST['confirm_password'] ?? '';
 
-    if (empty($email)) {
-        $error = 'Please enter your email.';
+    if (empty($email) || empty($new_password) || empty($confirm_password)) {
+        $error = 'Please fill out all fields.';
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $error = 'Invalid email format.';
+    } elseif ($new_password !== $confirm_password) {
+        $error = 'Passwords do not match.';
     } else {
         require_once __DIR__ . '/../config/db.php';
 
+        // Check if email exists
         $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ? LIMIT 1");
         $stmt->execute([$email]);
         
-        // Always show the same success message to prevent user enumeration
-        $success = 'If an account with that email exists, a password reset link has been sent.';
+        if ($stmt->fetch()) {
+            $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
+            $update_stmt = $pdo->prepare("UPDATE users SET password = ? WHERE email = ?");
+            if ($update_stmt->execute([$hashed_password, $email])) {
+                $success = 'Password has been updated successfully. You can now login.';
+            } else {
+                $error = 'Failed to update password. Please try again later.';
+            }
+        } else {
+            $error = 'No account found with that email address.';
+        }
     }
 }
 ?>
@@ -45,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <div class="w-full max-w-sm">
         <h1 class="text-4xl font-bold mb-2">Forgot Password</h1>
-        <p class="text-gray-600 mb-8 font-medium">Enter your email to receive a reset link</p>
+        <p class="text-gray-600 mb-8 font-medium">Enter your email and new password below</p>
 
         <?php if ($error): ?>
         <div class="mb-5 flex items-center gap-2 border border-black text-black px-4 py-3 text-sm font-medium">
@@ -67,7 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <form method="POST" action="forgot-pw.php" novalidate>
             <!-- Email -->
-            <div class="relative mb-8 mt-2">
+            <div class="relative mb-6 mt-2">
                 <input
                     type="email"
                     id="email"
@@ -86,12 +100,56 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <span class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 peer-focus:text-black text-xl transition-colors">mail_outline</span>
             </div>
 
+            <!-- New Password -->
+            <div class="relative mb-6">
+                <input
+                    type="password"
+                    id="new_password"
+                    name="new_password"
+                    placeholder="New Password"
+                    required
+                    class="peer w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition bg-transparent placeholder-transparent"
+                />
+                <label
+                    for="new_password"
+                    class="absolute left-10 -top-2.5 bg-white px-1 text-xs text-gray-500 transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-3 peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-black pointer-events-none"
+                >
+                    New Password
+                </label>
+                <span class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 peer-focus:text-black text-xl transition-colors">lock_outline</span>
+                <button type="button" class="toggle-pw absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-black transition-colors" data-target="new_password">
+                    <span class="material-icons text-xl">visibility_off</span>
+                </button>
+            </div>
+
+            <!-- Confirm Password -->
+            <div class="relative mb-8">
+                <input
+                    type="password"
+                    id="confirm_password"
+                    name="confirm_password"
+                    placeholder="Confirm Password"
+                    required
+                    class="peer w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition bg-transparent placeholder-transparent"
+                />
+                <label
+                    for="confirm_password"
+                    class="absolute left-10 -top-2.5 bg-white px-1 text-xs text-gray-500 transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-3 peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-black pointer-events-none"
+                >
+                    Confirm Password
+                </label>
+                <span class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 peer-focus:text-black text-xl transition-colors">lock_outline</span>
+                <button type="button" class="toggle-pw absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-black transition-colors" data-target="confirm_password">
+                    <span class="material-icons text-xl">visibility_off</span>
+                </button>
+            </div>
+
             <!-- Submit -->
             <button
                 type="submit"
                 class="w-full bg-black hover:bg-gray-800 text-white font-bold py-3 rounded-lg transition duration-200"
             >
-                Send Reset Link
+                Reset Password
             </button>
             
             <!-- Login Redirect -->
@@ -102,5 +160,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         </form>
     </div>
+
+    <!-- Toggle Password Visibility Logic -->
+    <script>
+        const toggleBtns = document.querySelectorAll('.toggle-pw');
+        toggleBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const targetId = this.getAttribute('data-target');
+                const input = document.getElementById(targetId);
+                const icon = this.querySelector('.material-icons');
+                
+                if (input.getAttribute('type') === 'password') {
+                    input.setAttribute('type', 'text');
+                    icon.textContent = 'visibility';
+                } else {
+                    input.setAttribute('type', 'password');
+                    icon.textContent = 'visibility_off';
+                }
+            });
+        });
+    </script>
 </body>
 </html>
