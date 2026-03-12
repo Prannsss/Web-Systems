@@ -29,6 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             session_regenerate_id(true);
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['email']   = $user['email'];
+            $_SESSION['toast_success'] = 'Login Successful';
             header('Location: pages/dashboard.php');
             exit;
         } else {
@@ -56,15 +57,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="w-full max-w-sm">
         <h1 class="text-4xl font-bold mb-2">Login</h1>
         <p class="text-gray-600 mb-8 font-medium">Hi, Welcome back!</p>
-
-        <?php if ($error): ?>
-        <div class="mb-5 flex items-center gap-2 border border-black text-black px-4 py-3 text-sm font-medium">
-            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
-            <?= htmlspecialchars($error) ?>
-        </div>
-        <?php endif; ?>
 
         <form method="POST" action="index.php" novalidate>
             <!-- Email -->
@@ -148,6 +140,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             pwInput.setAttribute('type', isPassword ? 'text' : 'password');
             toggleIcon.textContent = isPassword ? 'visibility' : 'visibility_off';
         });
+    </script>
+    <!-- Toast Component -->
+    <?php include __DIR__ . '/components/toast.php'; ?>
+    <script>
+        <?php if (!empty($error)): ?>
+            goeyToast.error('<?= addslashes(htmlspecialchars($error)) ?>');
+        <?php endif; ?>
     </script>
 </body>
 </html>

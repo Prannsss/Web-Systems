@@ -64,5 +64,13 @@ $email = htmlspecialchars($_SESSION['email'] ?? '');
         &copy; <?= date('Y') ?> Web Systems
     </footer>
 
+    <!-- Toast Component -->
+    <?php include __DIR__ . '/../components/toast.php'; ?>
+    <script>
+        <?php if (!empty($_SESSION['toast_success'])): ?>
+            goeyToast.success('<?= addslashes(htmlspecialchars($_SESSION['toast_success'])) ?>');
+            <?php unset($_SESSION['toast_success']); ?>
+        <?php endif; ?>
+    </script>
 </body>
 </html>

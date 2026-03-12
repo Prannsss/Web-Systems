@@ -61,24 +61,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <h1 class="text-4xl font-bold mb-2">Forgot Password</h1>
         <p class="text-gray-600 mb-8 font-medium">Enter your email and new password below</p>
 
-        <?php if ($error): ?>
-        <div class="mb-5 flex items-center gap-2 border border-black text-black px-4 py-3 text-sm font-medium">
-            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
-            <?= htmlspecialchars($error) ?>
-        </div>
-        <?php endif; ?>
-
-        <?php if ($success): ?>
-        <div class="mb-5 flex items-center gap-2 border border-green-600 text-green-700 px-4 py-3 text-sm font-medium bg-green-50">
-            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-            </svg>
-            <?= htmlspecialchars($success) ?>
-        </div>
-        <?php endif; ?>
-
         <form method="POST" action="forgot-pw.php" novalidate>
             <!-- Email -->
             <div class="relative mb-6 mt-2">
@@ -179,6 +161,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             });
         });
+    </script>
+    <!-- Toast Component -->
+    <?php include __DIR__ . '/../components/toast.php'; ?>
+    <script>
+        <?php if (!empty($error)): ?>
+            goeyToast.error('<?= addslashes(htmlspecialchars($error)) ?>');
+        <?php endif; ?>
+        <?php if (!empty($success)): ?>
+            goeyToast.success('<?= addslashes(htmlspecialchars($success)) ?>');
+        <?php endif; ?>
     </script>
 </body>
 </html>
