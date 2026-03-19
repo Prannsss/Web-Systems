@@ -2,7 +2,8 @@
 session_start();
 
 if (isset($_SESSION['user_id'])) {
-    header('Location: pages/dashboard.php');
+    $redirect = ($_SESSION['role'] ?? 'user') === 'admin' ? '../admin/dashboard.php' : '../client/dashboard.php';
+    header("Location: $redirect");
     exit;
 }
 
@@ -21,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif ($password !== $confirm_password) {
         $error = 'Passwords do not match.';
     } else {
-        require_once __DIR__ . '/../config/db.php';
+        require_once __DIR__ . '/../../config/db.php';
 
         // Check if email exists
         $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ? LIMIT 1");
@@ -33,7 +34,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $hashed_password = password_hash($password, PASSWORD_DEFAULT);
             $stmt = $pdo->prepare("INSERT INTO users (email, password) VALUES (?, ?)");
             if ($stmt->execute([$email, $hashed_password])) {
-                $success = 'Account created successfully. You can now login.';
+                $_SESSION['toast_success'] = 'Account created successfully. You can now login.';
+                header('Location: ../../index.php');
+                exit;
             } else {
                 $error = 'Something went wrong. Please try again later.';
             }
@@ -137,7 +140,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <!-- Login Redirect -->
             <p class="text-center text-sm font-medium mt-6">
                 <span class="text-gray-500">Already registered?</span>
-                <a href="../index.php" class="text-black hover:underline ml-1">Login here</a>
+                <a href="../../index.php" class="text-black hover:underline ml-1">Login here</a>
             </p>
 
         </form>
@@ -163,7 +166,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         });
     </script>
     <!-- Toast Component -->
-    <?php include __DIR__ . '/../components/toast.php'; ?>
+    <?php include __DIR__ . '/../../components/toast.php'; ?>
     <script>
         <?php if (!empty($error)): ?>
             goeyToast.error('<?= addslashes(htmlspecialchars($error)) ?>');

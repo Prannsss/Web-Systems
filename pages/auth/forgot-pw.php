@@ -2,7 +2,8 @@
 session_start();
 
 if (isset($_SESSION['user_id'])) {
-    header('Location: pages/dashboard.php');
+    $redirect = ($_SESSION['role'] ?? 'user') === 'admin' ? '../admin/dashboard.php' : '../client/dashboard.php';
+    header("Location: $redirect");
     exit;
 }
 
@@ -21,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif ($new_password !== $confirm_password) {
         $error = 'Passwords do not match.';
     } else {
-        require_once __DIR__ . '/../config/db.php';
+        require_once __DIR__ . '/../../config/db.php';
 
         // Check if email exists
         $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ? LIMIT 1");
@@ -137,7 +138,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <!-- Login Redirect -->
             <p class="text-center text-sm font-medium mt-6">
                 <span class="text-gray-500">Remembered your password?</span>
-                <a href="../index.php" class="text-black hover:underline ml-1">Login here</a>
+                <a href="../../index.php" class="text-black hover:underline ml-1">Login here</a>
             </p>
 
         </form>
@@ -163,7 +164,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         });
     </script>
     <!-- Toast Component -->
-    <?php include __DIR__ . '/../components/toast.php'; ?>
+    <?php include __DIR__ . '/../../components/toast.php'; ?>
     <script>
         <?php if (!empty($error)): ?>
             goeyToast.error('<?= addslashes(htmlspecialchars($error)) ?>');

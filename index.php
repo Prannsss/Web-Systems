@@ -3,7 +3,8 @@ session_start();
 
 // Redirect if already logged in
 if (isset($_SESSION['user_id'])) {
-    header('Location: pages/dashboard.php');
+    $redirect_url = ($_SESSION['role'] ?? 'user') === 'admin' ? 'pages/admin/dashboard.php' : 'pages/client/dashboard.php';
+    header('Location: ' . $redirect_url);
     exit;
 }
 
@@ -20,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         require_once __DIR__ . '/config/db.php';
 
-        $stmt = $pdo->prepare("SELECT id, email, password FROM users WHERE email = ? LIMIT 1");
+        $stmt = $pdo->prepare("SELECT id, email, password, role FROM users WHERE email = ? LIMIT 1");
         $stmt->execute([$email]);
         $user = $stmt->fetch();
 
@@ -29,8 +30,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             session_regenerate_id(true);
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['email']   = $user['email'];
+            $_SESSION['role']    = $user['role'];
             $_SESSION['toast_success'] = 'Login Successful';
-            header('Location: pages/dashboard.php');
+            
+            $redirect_url = $user['role'] === 'admin' ? 'pages/admin/dashboard.php' : 'pages/client/dashboard.php';
+            header('Location: ' . $redirect_url);
             exit;
         } else {
             $error = 'Invalid email or password.';
@@ -109,7 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <input type="checkbox" class="w-4 h-4 accent-black" />
                     Remember Me
                 </label>
-                <a href="pages/forgot-pw.php" class="text-sm font-medium text-black hover:underline">Forgot Password?</a>
+                <a href="pages/auth/forgot-pw.php" class="text-sm font-medium text-black hover:underline">Forgot Password?</a>
             </div>
 
             <!-- Submit -->
@@ -123,7 +127,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <!-- Register Redirect -->
             <p class="text-center text-sm font-medium mt-6">
                 <span class="text-gray-500">Not registered yet?</span>
-                <a href="pages/create-acc.php" class="text-black hover:underline ml-1">Create an account</a>
+                <a href="pages/auth/create-acc.php" class="text-black hover:underline ml-1">Create an account</a>
             </p>
 
         </form>
@@ -144,6 +148,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <!-- Toast Component -->
     <?php include __DIR__ . '/components/toast.php'; ?>
     <script>
+        <?php if (!empty($_SESSION['toast_success'])): ?>
+            goeyToast.success('<?= addslashes(htmlspecialchars($_SESSION['toast_success'])) ?>');
+            <?php unset($_SESSION['toast_success']); ?>
+        <?php endif; ?>
         <?php if (!empty($error)): ?>
             goeyToast.error('<?= addslashes(htmlspecialchars($error)) ?>');
         <?php endif; ?>

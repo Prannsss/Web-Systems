@@ -1,9 +1,9 @@
 <?php
 session_start();
 
-// Guard — must be logged in
-if (!isset($_SESSION['user_id'])) {
-    header('Location: ../index.php');
+// Guard — must be logged in & must be a user
+if (!isset($_SESSION['user_id']) || ($_SESSION['role'] ?? 'user') !== 'user') {
+    header('Location: ../../index.php');
     exit;
 }
 
@@ -34,10 +34,10 @@ $email = htmlspecialchars($_SESSION['email'] ?? '');
 
         <div class="flex items-center gap-6">
             <!-- Theme Toggle Component -->
-            <?php include __DIR__ . '/../components/theme-toggle.php'; ?>
+            <?php include __DIR__ . '/../../components/theme-toggle.php'; ?>
             
             <span class="text-sm text-gray-500 dark:text-gray-400 hidden sm:block"><?= $email ?></span>
-            <a href="../config/logout.php"
+            <a href="../../config/logout.php"
             class="text-sm border border-black dark:border-white px-5 py-2 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition duration-200 font-medium text-black dark:text-white">
                 Logout
             </a>
@@ -65,7 +65,7 @@ $email = htmlspecialchars($_SESSION['email'] ?? '');
     </footer>
 
     <!-- Toast Component -->
-    <?php include __DIR__ . '/../components/toast.php'; ?>
+    <?php include __DIR__ . '/../../components/toast.php'; ?>
     <script>
         <?php if (!empty($_SESSION['toast_success'])): ?>
             goeyToast.success('<?= addslashes(htmlspecialchars($_SESSION['toast_success'])) ?>');
